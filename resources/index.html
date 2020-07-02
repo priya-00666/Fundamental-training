@@ -1,0 +1,19 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Configuration of {{ ctx.instance.id }}</title>
+  <meta name="author" content="Cloudify">
+</head>
+
+<body>
+    <p>Parameters for {{ ctx.node.id }} </p>
+    <ul>
+    {% for color in ctx.node.properties.colors %}
+      <li>color : {{ color }}</li>
+    {% endfor %}
+    </ul>
+</body>
+
+</html>
