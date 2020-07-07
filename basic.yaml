@@ -11,7 +11,7 @@ node_templates:
       ip: REPLACE_WITH_IP_ADDRESS
       agent_config:
         user: centos
-        key: { get_secret: agent_key_private}
+        key: { get_secret: traning_agent_key_private}
 
   my_application:
     type: cloudify.nodes.Root
