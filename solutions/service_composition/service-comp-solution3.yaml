@@ -1,0 +1,55 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+
+inputs:
+
+
+  ops-vm-full-deployment_name:
+    default: osp-vm-1
+
+  agent_key_private:
+    description: >
+      The content of the agent's private key.
+    default: { get_secret: agent_key_private }
+
+node_templates:
+
+
+
+  osp-vm:
+    type: cloudify.nodes.SharedResource
+    properties:
+      client:
+        host: 127.0.0.1
+        username: admin
+        password: admin
+        tenant: default_tenant
+      resource_config:
+        deployment:
+          id: { get_input : ops-vm-full-deployment_name }
+
+  application:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &terminal_auth
+              user: ubuntu
+              key_content: { get_input: agent_key_private }
+              ip: { get_attribute: [osp-vm, capabilities, vm-ip ] }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: 'sudo apt-get update'
+              - action: 'sudo apt-get -y install apache2'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: osp-vm

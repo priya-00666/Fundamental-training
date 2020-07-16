@@ -4,6 +4,7 @@ imports:
   - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
+  - service-comp-solution1-types.yaml
 
 
 inputs:
@@ -50,32 +51,7 @@ dsl_definitions:
     region: { get_secret: keystone_region }
 
 
-node_types:
-  nodes.MonitoredServer:
-    derived_from: cloudify.openstack.nodes.Server
-    properties:
-      agent_config:
-        default:
-          network: { get_input: manager_network }
-          install_method: init_script
-          user: { get_input: agent_user }
-          port: 22
-          key: { get_input: agent_key_private }
-      server:
-        default:
-          key_name: ''
-          image: { get_input: image }
-          flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              default:
-                image: { get_input: image }
-                flavor: { get_input: flavor }
-                userdata: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+## Type moved to another file
 
 node_templates:
 
@@ -171,7 +147,3 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
-capabilities:
-  vm-ip:
-    value: {get_attribute: [ floating_ip , floating_ip_address ]}

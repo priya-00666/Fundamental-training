@@ -4,7 +4,7 @@ imports:
   - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
-
+  - NETWORK--service-comp-solution2-import.yaml
 
 inputs:
 
@@ -109,69 +109,7 @@ node_templates:
     properties:
       openstack_config: *openstack_config
     relationships:
-      - target: host_port
+      - target: NETWORK--host_port
         type: cloudify.openstack.server_connected_to_port
       - type: cloudify.relationships.depends_on
         target: cloudify_host_cloud_config
-
-  floating_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-    properties:
-      openstack_config: *openstack_config
-      floatingip:
-        floating_network_id: { get_capability: [ get_attribute : [openstack, deployment, id], external_network ] }
-    relationships:
-    - type: cloudify.relationships.contained_in
-      target: openstack
-
-
-  host_port:
-    type: cloudify.openstack.nodes.Port
-    properties:
-      openstack_config: *openstack_config
-    relationships:
-      - type: cloudify.relationships.contained_in
-        target: public_network
-      - type: cloudify.relationships.depends_on
-        target: public_subnet
-      - type: cloudify.openstack.port_connected_to_security_group
-        target: security_group
-      - type: cloudify.openstack.port_connected_to_floating_ip
-        target: floating_ip
-
-
-  security_group:
-    type: cloudify.openstack.nodes.SecurityGroup
-    properties:
-      openstack_config: *openstack_config
-      security_group:
-        description: security_group
-      rules:
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 22
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 80
-
-  public_subnet:
-    type: cloudify.openstack.nodes.Subnet
-    properties:
-      openstack_config: *openstack_config
-      use_external_resource: true
-      resource_id: { get_capability: [ get_attribute : [openstack, deployment, id], public_subnet ] }
-    relationships:
-    - type: cloudify.relationships.contained_in
-      target: public_network
-
-  public_network:
-    type: cloudify.openstack.nodes.Network
-    properties:
-      openstack_config: *openstack_config
-      use_external_resource: true
-      resource_id: { get_capability: [ get_attribute : [openstack, deployment, id], public_network ] }
-    relationships:
-    - type: cloudify.relationships.contained_in
-      target: openstack
-
-capabilities:
-  vm-ip:
-    value: {get_attribute: [ floating_ip , floating_ip_address ]}

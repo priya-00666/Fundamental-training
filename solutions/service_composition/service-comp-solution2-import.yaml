@@ -50,46 +50,9 @@ dsl_definitions:
     region: { get_secret: keystone_region }
 
 
-node_types:
-  nodes.MonitoredServer:
-    derived_from: cloudify.openstack.nodes.Server
-    properties:
-      agent_config:
-        default:
-          network: { get_input: manager_network }
-          install_method: init_script
-          user: { get_input: agent_user }
-          port: 22
-          key: { get_input: agent_key_private }
-      server:
-        default:
-          key_name: ''
-          image: { get_input: image }
-          flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              default:
-                image: { get_input: image }
-                flavor: { get_input: flavor }
-                userdata: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
 
 node_templates:
 
-  cloudify_host_cloud_config:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        users:
-        - name: { get_input: agent_user }
-          groups: sudo
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_input: agent_key_public }
 
   openstack:
     type: cloudify.nodes.SharedResource
@@ -104,15 +67,6 @@ node_templates:
           id: { get_input : network_deployment_name }
 
 
-  frontend_host:
-    type: nodes.MonitoredServer
-    properties:
-      openstack_config: *openstack_config
-    relationships:
-      - target: host_port
-        type: cloudify.openstack.server_connected_to_port
-      - type: cloudify.relationships.depends_on
-        target: cloudify_host_cloud_config
 
   floating_ip:
     type: cloudify.openstack.nodes.FloatingIP
@@ -171,7 +125,3 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
-capabilities:
-  vm-ip:
-    value: {get_attribute: [ floating_ip , floating_ip_address ]}
