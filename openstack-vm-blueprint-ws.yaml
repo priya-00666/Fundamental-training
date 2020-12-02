@@ -1,10 +1,10 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-openstack-plugin
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-openstack-plugin?version= >=3.0.0
   - plugin:cloudify-utilities-plugin
-
+  - plugin:cloudify-diamond-plugin
 
 
 inputs:
@@ -41,6 +41,12 @@ inputs:
   network_deployment_name:
     default: openstack-example-network
 
+  user_domain_name:
+    default: default
+
+  project_domain_name:
+    default: default
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -48,12 +54,13 @@ dsl_definitions:
     password: { get_secret: keystone_password }
     tenant_name: { get_secret: keystone_tenant_name }
     auth_url: { get_secret: keystone_url }
-    region: { get_secret: keystone_region }
-
+    region_name: { get_secret: keystone_region }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_types:
   nodes.Server:
-    derived_from: cloudify.openstack.nodes.Server
+    derived_from: cloudify.nodes.openstack.Server
     properties:
       agent_config:
         default:
@@ -62,21 +69,6 @@ node_types:
           user: { get_input: agent_user }
           port: 22
           key: { get_input: agent_key_private }
-      server:
-        default:
-          key_name: ''
-          image: { get_input: image }
-          flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              default:
-                image: { get_input: image }
-                flavor: { get_input: flavor }
-                userdata: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
 
 node_templates:
 
@@ -95,80 +87,86 @@ node_templates:
   openstack:
     type: cloudify.nodes.SharedResource
     properties:
-      client:
-        host: 127.0.0.1
-        username: admin
-        password: admin
-        tenant: default_tenant
       resource_config:
         deployment:
-          id: { get_input : network_deployment_name }
+          id: { get_input: network_deployment_name }
 
 
   frontend_host:
     type: nodes.Server
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
+      resource_config:
+        image_id: { get_input: image }
+        flavor_id: { get_input: flavor }
+        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
     relationships:
       - target: host_port
-        type: cloudify.openstack.server_connected_to_port
+        type: cloudify.relationships.openstack.server_connected_to_port
       - type: cloudify.relationships.depends_on
         target: cloudify_host_cloud_config
 
 
   floating_ip:
-    type: cloudify.openstack.nodes.FloatingIP
+    type: cloudify.nodes.openstack.FloatingIP
     properties:
-      openstack_config: *openstack_config
-      floatingip:
-        floating_network_id: { get_attribute: [ openstack, deployment, outputs, external_network ] }
+      client_config: *openstack_config
+      resource_config:
+        floating_network_id: { get_capability: [ { get_input: network_deployment_name }, external_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
 
 
   host_port:
-    type: cloudify.openstack.nodes.Port
+    type: cloudify.nodes.openstack.Port
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
     relationships:
       - type: cloudify.relationships.contained_in
         target: public_network
       - type: cloudify.relationships.depends_on
         target: public_subnet
-      - type: cloudify.openstack.port_connected_to_security_group
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
         target: security_group
-      - type: cloudify.openstack.port_connected_to_floating_ip
+      - type: cloudify.relationships.openstack.port_connected_to_floating_ip
         target: floating_ip
 
   security_group:
-    type: cloudify.openstack.nodes.SecurityGroup
+    type: cloudify.nodes.openstack.SecurityGroup
     properties:
-      openstack_config: *openstack_config
-      security_group:
-        description: security_group
-      rules:
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 22
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 80
+      client_config: *openstack_config
+      resource_config:
+        name: security-group
+        description: 'security group'
+      security_group_rules:
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 80
+          port_range_max: 80
 
   public_subnet:
-    type: cloudify.openstack.nodes.Subnet
+    type: cloudify.nodes.openstack.Subnet
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
       use_external_resource: true
-      resource_id: { get_attribute: [ openstack, deployment, outputs, public_subnet ] }
+      resource_config:
+        id: { get_capability: [ { get_input: network_deployment_name }, public_subnet ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: public_network
 
   public_network:
-    type: cloudify.openstack.nodes.Network
+    type: cloudify.nodes.openstack.Network
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
       use_external_resource: true
-      resource_id: { get_attribute: [ openstack, deployment, outputs, public_network ] }
+      resource_config:
+        id: { get_capability: [ { get_input: network_deployment_name }, public_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack

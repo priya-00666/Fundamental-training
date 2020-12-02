@@ -1,8 +1,16 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-openstack-plugin
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-openstack-plugin?version= >=3.0.0
+
+inputs:
+
+  user_domain_name:
+    default: default
+
+  project_domain_name:
+    default: default
 
 
 dsl_definitions:
@@ -12,26 +20,71 @@ dsl_definitions:
     password: { get_secret: keystone_password }
     tenant_name: { get_secret: keystone_tenant_name }
     auth_url: { get_secret: keystone_url }
-    region: { get_secret: region }
+    region_name: { get_secret: keystone_region }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 
   FrontEnd:
-    type:  cloudify.openstack.nodes.Server
+    type:  cloudify.nodes.openstack.Server
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
       image: {  get_secret: centos_core_image }
       flavor:  { get_secret: small_image_flavor }
-      management_network_name:  { get_secret: private_network_name }
       agent_config:
         install_method: none
+    relationships:
+      - target: frontend_host_port
+        type: cloudify.relationships.openstack.server_connected_to_port
 
   BackEnd:
-    type:  cloudify.openstack.nodes.Server
+    type:  cloudify.nodes.openstack.Server
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
       image: {  get_secret: centos_core_image }
       flavor:  { get_secret: small_image_flavor }
-      management_network_name:  { get_secret: private_network_name }
       agent_config:
         install_method: none
+    relationships:
+      - target: backend_host_port
+        type: cloudify.relationships.openstack.server_connected_to_port
+
+  frontend_host_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_network
+      - type: cloudify.relationships.depends_on
+        target: private_subnet
+
+  backend_host_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_network
+      - type: cloudify.relationships.depends_on
+        target: private_subnet
+
+  private_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        id: { get_secret: private_subnet_name }
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_network
+
+  private_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        id: { get_secret: private_network_name }
