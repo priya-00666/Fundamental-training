@@ -31,7 +31,7 @@ inputs:
 
   external_network_name:
     description: Openstack tenant external network name.
-    default: { get_secret: external_network }
+    default: { get_secret: external_network_name }
 
   nameservers:
     default: [8.8.4.4, 8.8.8.8]
