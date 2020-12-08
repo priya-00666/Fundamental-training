@@ -170,6 +170,6 @@ node_templates:
     - type: cloudify.relationships.contained_in
       target: openstack
 
-outputs:
+capabilities:
   vm-ip:
     value: {get_attribute: [floating_ip, floating_ip_address] }
