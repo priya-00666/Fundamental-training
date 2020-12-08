@@ -58,18 +58,6 @@ dsl_definitions:
     project_domain_name: { get_input: project_domain_name }
 
 
-node_types:
-  nodes.MonitoredServer:
-    derived_from: cloudify.nodes.openstack.Server
-    properties:
-      agent_config:
-        default:
-          network: { get_input: manager_network }
-          install_method: init_script
-          user: { get_input: agent_user }
-          port: 22
-          key: { get_input: agent_key_private }
-
 node_templates:
 
   cloudify_host_cloud_config:
@@ -98,13 +86,19 @@ node_templates:
 
 
   frontend_host:
-    type: nodes.MonitoredServer
+    type: cloudify.nodes.openstack.Server
     properties:
       client_config: *openstack_config
       resource_config:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+      agent_config:
+        network: { get_input: manager_network }
+        install_method: init_script
+        user: { get_input: agent_user }
+        port: 22
+        key: { get_input: agent_key_private }
     relationships:
       - target: host_port
         type: cloudify.relationships.openstack.server_connected_to_port
