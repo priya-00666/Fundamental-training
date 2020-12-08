@@ -1,8 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-openstack-plugin
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-openstack-plugin?version= >=3.0.0
   - plugin:cloudify-utilities-plugin
   - NETWORK--service-comp-solution2-import.yaml
 
@@ -35,10 +35,16 @@ inputs:
     default: '2'
 
   manager_network:
-    default: default
+    default: external
 
   network_deployment_name:
     default: openstack-example-network
+
+  user_domain_name:
+    default: default
+
+  project_domain_name:
+    default: default
 
 dsl_definitions:
 
@@ -47,12 +53,13 @@ dsl_definitions:
     password: { get_secret: keystone_password }
     tenant_name: { get_secret: keystone_tenant_name }
     auth_url: { get_secret: keystone_url }
-    region: { get_secret: keystone_region }
-
+    region_name: { get_secret: keystone_region }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_types:
-  nodes.MonitoredServer:
-    derived_from: cloudify.openstack.nodes.Server
+  nodes.CustomServer:
+    derived_from: cloudify.nodes.openstack.Server
     properties:
       agent_config:
         default:
@@ -61,23 +68,9 @@ node_types:
           user: { get_input: agent_user }
           port: 22
           key: { get_input: agent_key_private }
-      server:
-        default:
-          key_name: ''
-          image: { get_input: image }
-          flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              default:
-                image: { get_input: image }
-                flavor: { get_input: flavor }
-                userdata: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
 
 node_templates:
+
 
   cloudify_host_cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
@@ -91,25 +84,17 @@ node_templates:
           ssh-authorized-keys:
           - { get_input: agent_key_public }
 
-  openstack:
-    type: cloudify.nodes.SharedResource
-    properties:
-      client:
-        host: 127.0.0.1
-        username: admin
-        password: admin
-        tenant: default_tenant
-      resource_config:
-        deployment:
-          id: { get_input : network_deployment_name }
-
 
   frontend_host:
-    type: nodes.MonitoredServer
+    type: nodes.CustomServer
     properties:
-      openstack_config: *openstack_config
+      client_config: *openstack_config
+      resource_config:
+        image_id: { get_input: image }
+        flavor_id: { get_input: flavor }
+        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
     relationships:
       - target: NETWORK--host_port
-        type: cloudify.openstack.server_connected_to_port
+        type: cloudify.relationships.openstack.server_connected_to_port
       - type: cloudify.relationships.depends_on
         target: cloudify_host_cloud_config

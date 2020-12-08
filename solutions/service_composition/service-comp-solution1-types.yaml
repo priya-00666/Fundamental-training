@@ -1,6 +1,6 @@
 node_types:
-  nodes.MonitoredServer:
-    derived_from: cloudify.openstack.nodes.Server
+  nodes.CustomServer:
+    derived_from: cloudify.nodes.openstack.Server
     properties:
       agent_config:
         default:
@@ -9,18 +9,3 @@ node_types:
           user: { get_input: agent_user }
           port: 22
           key: { get_input: agent_key_private }
-      server:
-        default:
-          key_name: ''
-          image: { get_input: image }
-          flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              default:
-                image: { get_input: image }
-                flavor: { get_input: flavor }
-                userdata: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
