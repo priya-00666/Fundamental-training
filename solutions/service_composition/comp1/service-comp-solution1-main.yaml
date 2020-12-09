@@ -4,7 +4,7 @@ imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.0.0
   - plugin:cloudify-utilities-plugin
-
+  - service-comp-solution1-types.yaml
 
 inputs:
 
@@ -58,7 +58,9 @@ dsl_definitions:
     project_domain_name: { get_input: project_domain_name }
 
 
+
 node_templates:
+
 
   cloudify_host_cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
@@ -86,19 +88,13 @@ node_templates:
 
 
   frontend_host:
-    type: cloudify.nodes.openstack.Server
+    type: nodes.CustomServer
     properties:
       client_config: *openstack_config
       resource_config:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
-      agent_config:
-        network: { get_input: manager_network }
-        install_method: init_script
-        user: { get_input: agent_user }
-        port: 22
-        key: { get_input: agent_key_private }
     relationships:
       - target: host_port
         type: cloudify.relationships.openstack.server_connected_to_port
@@ -169,7 +165,3 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
-capabilities:
-  vm-ip:
-    value: {get_attribute: [floating_ip, floating_ip_address] }

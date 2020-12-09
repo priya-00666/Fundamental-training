@@ -58,7 +58,44 @@ dsl_definitions:
     project_domain_name: { get_input: project_domain_name }
 
 
+node_types:
+  nodes.CustomServer:
+    derived_from: cloudify.nodes.openstack.Server
+    properties:
+      agent_config:
+        default:
+          network: { get_input: manager_network }
+          install_method: init_script
+          user: { get_input: agent_user }
+          port: 22
+          key: { get_input: agent_key_private }
+
 node_templates:
+
+  apache:
+    type: cloudify.nodes.ApplicationModule
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start: scripts/install_apache.sh
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: server_host
+    - type: relationship.get_db_ip
+      target: db_host
+      source_interfaces:
+        cloudify.interfaces.relationship_lifecycle:
+          establish:
+            inputs:
+              db_ip: { get_attribute: [db_host, public_ip_address] }
+
+  mysql:
+    type: cloudify.nodes.ApplicationModule
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start: scripts/install_mysql.sh
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: db_host
 
   cloudify_host_cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
@@ -84,23 +121,16 @@ node_templates:
         deployment:
           id: { get_input : network_deployment_name }
 
-
-  frontend_host:
-    type: cloudify.nodes.openstack.Server
+  server_host:
+    type: nodes.CustomServer
     properties:
       client_config: *openstack_config
       resource_config:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
-      agent_config:
-        network: { get_input: manager_network }
-        install_method: init_script
-        user: { get_input: agent_user }
-        port: 22
-        key: { get_input: agent_key_private }
     relationships:
-      - target: host_port
+      - target: server_host_port
         type: cloudify.relationships.openstack.server_connected_to_port
       - type: cloudify.relationships.depends_on
         target: cloudify_host_cloud_config
@@ -115,8 +145,7 @@ node_templates:
     - type: cloudify.relationships.contained_in
       target: openstack
 
-
-  host_port:
+  server_host_port:
     type: cloudify.nodes.openstack.Port
     properties:
       client_config: *openstack_config
@@ -130,6 +159,43 @@ node_templates:
       - type: cloudify.relationships.openstack.port_connected_to_floating_ip
         target: floating_ip
 
+  db_host:
+    type: nodes.CustomServer
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        image_id: { get_input: image }
+        flavor_id: { get_input: flavor }
+        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+    relationships:
+      - target: db_host_port
+        type: cloudify.relationships.openstack.server_connected_to_port
+      - type: cloudify.relationships.depends_on
+        target: cloudify_host_cloud_config
+
+  db_floating_ip:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        floating_network_id: { get_capability: [ { get_input: network_deployment_name }, external_network ] }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: openstack
+
+  db_host_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_network
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
+        target: security_group
+      - type: cloudify.relationships.openstack.port_connected_to_floating_ip
+        target: db_floating_ip
 
   security_group:
     type: cloudify.nodes.openstack.SecurityGroup
@@ -170,6 +236,23 @@ node_templates:
     - type: cloudify.relationships.contained_in
       target: openstack
 
+relationships:
+  relationship.get_db_ip:
+    derived_from: cloudify.relationships.connected_to
+    source_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        establish: 
+          implementation: scripts/expose_db_ip.sh
+          inputs:
+            db_ip:
+              type: string
+
 capabilities:
-  vm-ip:
-    value: {get_attribute: [floating_ip, floating_ip_address] }
+  db_ip:
+    value: { get_attribute: [db_host, public_ip_address] }
+  url:
+    value:
+      concat:
+        - 'http://'
+        - { get_attribute: [server_host, public_ip_address] }
+        - '/'

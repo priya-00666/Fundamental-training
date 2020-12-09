@@ -58,7 +58,33 @@ dsl_definitions:
     project_domain_name: { get_input: project_domain_name }
 
 
+node_types:
+  nodes.CustomServer:
+    derived_from: cloudify.nodes.openstack.Server
+    properties:
+      agent_config:
+        default:
+          network: { get_input: manager_network }
+          install_method: init_script
+          user: { get_input: agent_user }
+          port: 22
+          key: { get_input: agent_key_private }
+
 node_templates:
+
+  AppA:
+    type: cloudify.nodes.ApplicationModule
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: frontend_host
+    - type: relationship.connected_to_datefile
+      target: AppB
+
+  AppB:
+    type: cloudify.nodes.ApplicationModule
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: backend_host
 
   cloudify_host_cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
@@ -86,19 +112,13 @@ node_templates:
 
 
   frontend_host:
-    type: cloudify.nodes.openstack.Server
+    type: nodes.CustomServer
     properties:
       client_config: *openstack_config
       resource_config:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
-      agent_config:
-        network: { get_input: manager_network }
-        install_method: init_script
-        user: { get_input: agent_user }
-        port: 22
-        key: { get_input: agent_key_private }
     relationships:
       - target: host_port
         type: cloudify.relationships.openstack.server_connected_to_port
@@ -129,6 +149,48 @@ node_templates:
         target: security_group
       - type: cloudify.relationships.openstack.port_connected_to_floating_ip
         target: floating_ip
+
+
+  backend_host:
+    type: nodes.CustomServer
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        image_id: { get_input: image }
+        flavor_id: { get_input: flavor }
+        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+    relationships:
+      - target: backend_host_port
+        type: cloudify.relationships.openstack.server_connected_to_port
+      - type: cloudify.relationships.depends_on
+        target: cloudify_host_cloud_config
+
+  backend_floating_ip:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        floating_network_id: { get_capability: [ { get_input: network_deployment_name }, external_network ] }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: openstack
+
+
+  backend_host_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_network
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
+        target: security_group
+      - type: cloudify.relationships.openstack.port_connected_to_floating_ip
+        target: backend_floating_ip
+
+
 
 
   security_group:
@@ -170,6 +232,13 @@ node_templates:
     - type: cloudify.relationships.contained_in
       target: openstack
 
-capabilities:
-  vm-ip:
-    value: {get_attribute: [floating_ip, floating_ip_address] }
+
+relationships:
+  relationship.connected_to_datefile:
+    derived_from: cloudify.relationships.connected_to
+    source_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        establish: scripts/date.sh
+    target_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        establish: scripts/date.sh

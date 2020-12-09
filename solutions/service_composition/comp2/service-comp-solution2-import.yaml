@@ -3,8 +3,6 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.0.0
-  - plugin:cloudify-utilities-plugin
-
 
 inputs:
 
@@ -60,17 +58,6 @@ dsl_definitions:
 
 node_templates:
 
-  cloudify_host_cloud_config:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        users:
-        - name: { get_input: agent_user }
-          groups: sudo
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_input: agent_key_public }
 
   openstack:
     type: cloudify.nodes.SharedResource
@@ -85,25 +72,6 @@ node_templates:
           id: { get_input : network_deployment_name }
 
 
-  frontend_host:
-    type: cloudify.nodes.openstack.Server
-    properties:
-      client_config: *openstack_config
-      resource_config:
-        image_id: { get_input: image }
-        flavor_id: { get_input: flavor }
-        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
-      agent_config:
-        network: { get_input: manager_network }
-        install_method: init_script
-        user: { get_input: agent_user }
-        port: 22
-        key: { get_input: agent_key_private }
-    relationships:
-      - target: host_port
-        type: cloudify.relationships.openstack.server_connected_to_port
-      - type: cloudify.relationships.depends_on
-        target: cloudify_host_cloud_config
 
   floating_ip:
     type: cloudify.nodes.openstack.FloatingIP
@@ -114,7 +82,6 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
 
   host_port:
     type: cloudify.nodes.openstack.Port
@@ -129,7 +96,6 @@ node_templates:
         target: security_group
       - type: cloudify.relationships.openstack.port_connected_to_floating_ip
         target: floating_ip
-
 
   security_group:
     type: cloudify.nodes.openstack.SecurityGroup
@@ -169,7 +135,3 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
-capabilities:
-  vm-ip:
-    value: {get_attribute: [floating_ip, floating_ip_address] }

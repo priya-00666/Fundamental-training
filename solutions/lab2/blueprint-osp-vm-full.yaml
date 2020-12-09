@@ -170,6 +170,14 @@ node_templates:
     - type: cloudify.relationships.contained_in
       target: openstack
 
-capabilities:
-  vm-ip:
+outputs:
+  ip:
+    value: {get_attribute: [frontend_host, ip] }
+  floating-ip:
     value: {get_attribute: [floating_ip, floating_ip_address] }
+  image:
+    value: {get_attribute: [frontend_host, server, image_id]}
+  flavor:
+    value: {get_attribute: [frontend_host, server, flavor_id]}
+  tenant:
+    value: {get_secret: keystone_tenant_name}
