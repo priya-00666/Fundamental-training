@@ -1,0 +1,11 @@
+node_types:
+  nodes.CustomServer:
+    derived_from: cloudify.nodes.openstack.Server
+    properties:
+      agent_config:
+        default:
+          network: { get_input: manager_network }
+          install_method: init_script
+          user: { get_input: agent_user }
+          port: 22
+          key: { get_input: agent_key_private }
