@@ -21,13 +21,13 @@ inputs:
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
-    default: ubuntu
+    default: centos
 
   image:
     description: >
       An Openstack Image ID. Tested with a Ubuntu 14.04 image.
     type: string
-    default: { get_secret: ubuntu_trusty_image }
+    default: { get_secret: centos_core_image }
 
   flavor:
     description: >
