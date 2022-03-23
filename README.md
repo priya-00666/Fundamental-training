@@ -42,7 +42,7 @@ The quickest way to upload blueprints to a Cloudify manager is with the command 
 
 Note, you can upload multiple copies of a blueprint file, but each copy will need to have a unique blueprint id.
 
-For example, the following command uploads the Grafana blueprint to the Cloudify manager, and gives it a blueprint name of `Grafana`:
+For example, the following command uploads the basic.yaml blueprint to the Cloudify manager, and gives it a blueprint id of `basic`:
 
 ```
 >$ pwd
