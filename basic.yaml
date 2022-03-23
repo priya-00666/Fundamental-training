@@ -1,4 +1,4 @@
-#Required blueprint section - Cloudify DSL 1.1.3 is the latest version
+#Required blueprint section - Cloudify DSL 1.3 is the latest version
 #https://docs.cloudify.co/latest/developer/blueprints/spec-versioning/
 tosca_definitions_version: cloudify_dsl_1_3
 
@@ -18,7 +18,7 @@ node_templates:
       agent_config: #default agent installation method is remote https://docs.cloudify.co/latest/install_maintain/agents/installation/#remote-default
         user: centos
         key: { get_secret: agent_key_private } #secret is pre-created in the Cloudify Training Labs Manager
-  #In this exercise our "application" cons
+  #In this exercise our "application" consists of simple scripts that log the current lifecycle 
   my_application:
     type: cloudify.nodes.Root #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
     interfaces:
