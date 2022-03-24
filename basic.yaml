@@ -1,14 +1,15 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/4.6/types.yaml
+  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
+
 
 node_templates:
 
   my_host:
     type: cloudify.nodes.Compute
     properties:
-      ip: REPLACE_WITH_IP_ADDRESS
+      ip: 35.197.220.112
       agent_config:
         user: centos
         key: { get_secret: training_agent_key_private }
