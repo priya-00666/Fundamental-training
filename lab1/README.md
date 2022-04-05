@@ -9,7 +9,10 @@ In this lab you will learn how use the Cloudify CLI to:
 * Delete a deployment
 
 
-References for this lab: [CLI Blueprints documenation](https://docs.cloudify.co/latest/cli/orch_cli/blueprints/), [CLI Deployments documentation](https://docs.cloudify.co/latest/cli/orch_cli/deployments/)
+## References for this lab: 
+* [CLI documenation - cfy blueprints](https://docs.cloudify.co/latest/cli/orch_cli/blueprints/)
+* [CLI documentation - cfy deployments](https://docs.cloudify.co/latest/cli/orch_cli/deployments/)
+* [CLI documenation - cfy executions](https://docs.cloudify.co/latest/cli/orch_cli/executions/)
 
 ## Uploading Blueprints
 
