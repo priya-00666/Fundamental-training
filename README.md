@@ -51,3 +51,4 @@ Here's a video that will introduce you to the Cloudify dashboard. [Manager Walk 
 
 ## Lab Exercises
 * [Lab 1](lab1/README.md)
+* [Lab 2](lab2/README.md)
