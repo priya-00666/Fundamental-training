@@ -6,13 +6,16 @@ In this lab you will learn about:
 * Using the `cfy install` command
 * Using the `cfy uninstall` command
 * Uploading a plugin
-* Delete a deployment
+* Modifying and extending blueprints
 
 
 ## References for this lab: 
 * [UI documenation - secrets](https://docs.cloudify.co/latest/working_with/console/pages/secrets-page/)
+* [UI documenation - plugins](https://docs.cloudify.co/latest/working_with/console/widgets/plugins/)
 * [CLI documentation - cfy install](https://docs.cloudify.co/latest/cli/orch_cli/install/)
 * [CLI documenation - cfy uninstall](https://docs.cloudify.co/latest/cli/orch_cli/uninstall/)
+* [Blueprints - Node templates](https://docs.cloudify.co/latest/developer/blueprints/spec-node-templates/)
+* [Blueprints - Relationships](https://docs.cloudify.co/latest/developer/blueprints/spec-relationships/)
 
 ## Getting Started
 Create and start your lab environment: 
