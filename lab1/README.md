@@ -9,7 +9,7 @@ In this lab you will learn how use the Cloudify CLI to:
 * Delete a deployment
 
 
-## References for this lab: 
+## References for this lab:
 * [CLI documenation - cfy blueprints](https://docs.cloudify.co/latest/cli/orch_cli/blueprints/)
 * [CLI documentation - cfy deployments](https://docs.cloudify.co/latest/cli/orch_cli/deployments/)
 * [CLI documenation - cfy executions](https://docs.cloudify.co/latest/cli/orch_cli/executions/)
@@ -198,7 +198,7 @@ Retrieving inputs for deployment hello...
 And now we'll update the deployment to use a different port.
 
 ```
- cfy dep update -i 'webserver_port=8800' hello
+ cfy deployments update -i 'webserver_port=8800' hello
 Updating deployment hello with new inputs
 2022-04-05 02:08:01.701  CFY <hello> Starting 'update' workflow execution
 2022-04-05 02:08:01.819  CFY <hello> Task started 'prepare_plan'
