@@ -50,5 +50,7 @@ These training exercises are meant to be used alongside Cloudify Fundamentals Tr
 Here's a video that will introduce you to the Cloudify dashboard. [Manager Walk Through Video](https://www.youtube.com/watch?v=R6SmO4qfILE&t=2s)
 
 ## Lab Exercises
-* [Lab 1](lab1/README.md)
-* [Lab 2](lab2/README.md)
+* [Lab 1 - Hello World](lab1/README.md)
+* [Lab 2 - Blueprints 1](lab2/README.md)
+* [Lab 3 - Blueprints 2](lab3/README.md)
+* [Lab 4 - Operations 1](lab4/README.md)
