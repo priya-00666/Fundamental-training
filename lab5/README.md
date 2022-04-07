@@ -1,4 +1,4 @@
-##Lab 5 - Service Composition
+## Lab 5 - Service Composition
 
 ### Lab 5 Objectives
 In this lab you will learn how use the Cloudify CLI to:
