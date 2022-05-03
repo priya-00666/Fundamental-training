@@ -8,10 +8,10 @@ In this lab you will learn about:
 
 ## References for this lab: 
 * Previous lab instructions and materials
-* [Blueprints - node types](https://docs.cloudify.co/latest/developer/blueprints/spec-node-types/)
-* [Blueprints - relationships](https://docs.cloudify.co/latest/developer/blueprints/spec-relationships/)
-* [Blueprints - interfaces](https://docs.cloudify.co/latest/developer/blueprints/spec-interfaces/)
-* [Cloudify plugins](https://cloudify.co/plugins/)
+* [Blueprints - node types](https://conductor.windriver.com/docs/22.03/developer/blueprints/spec-node-types/)
+* [Blueprints - relationships](https://conductor.windriver.com/docs/22.03/developer/blueprints/spec-relationships/)
+* [Blueprints - interfaces](https://conductor.windriver.com/docs/22.03/developer/blueprints/spec-interfaces/)
+
 
 ## Getting Started
 Create and start your lab environment:

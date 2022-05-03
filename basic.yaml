@@ -1,38 +1,36 @@
 #Required blueprint section - Cloudify DSL 1.3 is the latest version
-#https://docs.cloudify.co/latest/developer/blueprints/spec-versioning/
+
 tosca_definitions_version: cloudify_dsl_1_3
 
 #Required blueprint section - built-in Cloudify types.yaml
-#https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
+
 imports:
 
-  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
+  - https://cloudify.co/spec/cloudify/6.0.0/types.yaml
 
 
-  - http://www.getcloudify.org/spec/cloudify/6.3.1/types.yaml
 
 
 #Required blueprint section - describes topology
-#https://docs.cloudify.co/latest/developer/blueprints/spec-node-templates/
+
 node_templates:
   #In this exercise we're not creating a VM we're using an existing VM listed in your Cloudify Training Labs Dashboard
   my_host:
-    type: cloudify.nodes.Compute #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
+    type: cloudify.nodes.Compute
     properties:
       ip: REPLACE_WITH_IP_ADDRESS
-      agent_config: #default agent installation method is remote https://docs.cloudify.co/latest/install_maintain/agents/installation/#remote-default
+      agent_config: #default agent installation method is remote
         user: centos
-        key: { get_secret: training_agent_key_private } #secret is pre-created in the Cloudify Training Labs Manager
-  #In this exercise our "application" consists of simple scripts that log the current lifecycle
+        key: { get_secret: training_agent_key_private } #secret is pre-created
   my_application:
-    type: cloudify.nodes.Root #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
+    type: cloudify.nodes.Root
     interfaces:
-      cloudify.interfaces.lifecycle: #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
+      cloudify.interfaces.lifecycle:
         create: scripts/basic/creating.sh  #script location is relative to this blueprint file location
         configure: scripts/basic/configuring.sh
         start: scripts/basic/starting.sh
         stop: scripts/basic/stopping.sh
         delete: scripts/basic/deleting.sh
     relationships:
-      - type: cloudify.relationships.contained_in #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
+      - type: cloudify.relationships.contained_in 
         target: my_host

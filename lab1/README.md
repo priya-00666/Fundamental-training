@@ -10,9 +10,9 @@ In this lab you will learn how use the Cloudify CLI to:
 
 
 ## References for this lab:
-* [CLI documenation - cfy blueprints](https://docs.cloudify.co/latest/cli/orch_cli/blueprints/)
-* [CLI documentation - cfy deployments](https://docs.cloudify.co/latest/cli/orch_cli/deployments/)
-* [CLI documenation - cfy executions](https://docs.cloudify.co/latest/cli/orch_cli/executions/)
+* [CLI documenation - cfy blueprints](https://conductor.windriver.com/docs/22.03/cli/orch_cli/blueprints/)
+* [CLI documentation - cfy deployments](https://conductor.windriver.com/docs/22.03/cli/orch_cli/deployments/)
+* [CLI documenation - cfy executions](https://conductor.windriver.com/docs/22.03/cli/orch_cli/executions/)
 
 ## Uploading Blueprints
 
