@@ -133,17 +133,17 @@ Clean the environment (uninstall, delete deployment and blueprint) using `cfy un
 12. Extend the blueprint to provision 2 servers
 13. Upload and test the exptended blueprint
 
-### Part 4 - Introduction to relationships
+### Part 7 - Introduction to relationships
 Based on your updated blueprint-osp-vm (two servers) from previous section:
 1. Update the blueprint so one of the servers has a `depends_on` relationship to the other
 2. Inspect the installation process
 ## Additional Optional Exercises 
-### Part 5 - Update basic blueprint
+### Part 8 - Update basic blueprint
 Use the basic.yaml blueprint from earlier. 
 1. Update the blueprint to have `2 applications in the same host` 
 2. Deploy the blueprint and test
 3. Clean the environmnet
-### Part 6 - Relationships Introduction
+### Part 9 - Relationships Introduction
 Based on previous exercise, modify the bluerpint: 
 1. Add a `connected_to` relationship between the 2 applications
 2. Deploy the blueprint and test
