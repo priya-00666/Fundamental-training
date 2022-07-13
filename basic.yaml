@@ -6,9 +6,6 @@ tosca_definitions_version: cloudify_dsl_1_3
 #https://docs.cloudify.co/latest/developer/blueprints/built-in-types/
 imports:
 
-  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
-
-
   - http://www.getcloudify.org/spec/cloudify/6.3.1/types.yaml
 
 
