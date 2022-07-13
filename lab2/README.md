@@ -131,7 +131,7 @@ Clean the environment (uninstall, delete deployment and blueprint) using `cfy un
 
 ### Part 6 Simple OpenStack Blueprint - Extending the blueprint
 12. Extend the blueprint to provision 2 servers
-13. Upload and test the exptended blueprint
+13. Upload and test the extended blueprint
 
 ### Part 7 - Introduction to relationships
 Based on your updated blueprint-osp-vm (two servers) from previous section:
