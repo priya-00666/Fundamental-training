@@ -50,7 +50,6 @@ node_templates:
       - target: backend_host_port
         type: cloudify.relationships.openstack.server_connected_to_port
       - target: BackEnd
-
         type: cloudify.relationships.depends_on  
 
   frontend_host_port:
