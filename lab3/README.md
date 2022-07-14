@@ -79,4 +79,4 @@ relationships:
         establish: scripts/script.sh
 ```
 ### Solutions
-Solutions for labs 3 and 4 can be found in the solutions folder of the fundamentals-training repo.
+Solutions for part 3 and 4 can be found in the solutions folder of the fundamentals-training repo. [SOLUTION](https://github.com/Cloudify-PS/fundamentals-training/blob/631/solutions/lab4/blueprint-osp-vm-full-solution.yaml)
