@@ -16,7 +16,7 @@ These exercises are designed to be used with any Cloudify manager (current versi
 * [QCOW2](https://docs.cloudify.co/latest/cloudify_manager/premium/aio/install_and_configure/image/)
 * [SaaS](https://docs.cloudify.co/latest/cloudify_manager/saas/)
 
-A Cloudify AIO (All In One) Manager installed with the minimum required resources will be sufficient to complete the exercises.
+A Cloudify AIO (All In One) Manager installed with the minimum required resources will be sufficient to complete the exercises. Please see the full [installation prerequisites](https://docs.cloudify.co/latest/cloudify_manager/premium/aio/capacity_and_planning/) and [networking requirements](https://docs.cloudify.co/latest/cloudify_manager/architecture/high_level_architecture/networking/).
 
 <b>Centos/RHEL RPM-based AIO Cloudify Manager installation:</b>
 1. SSH to your VM
@@ -75,9 +75,9 @@ Here's a video that will introduce you to the Cloudify UI. [Manager Walk Through
 * [Lab 3 - Service Composition](lab3/README.md)
 * [Lab 4 - Operations](lab4/README.md)
 
-##Next steps
+## Next steps
 
-After completing the lab exercises you should be able to:
+After completing Labs 1-4 you should be able to:
 
 * Add your cloud provider credentials to your manager
 * Upload and deploy catalog blueprints (directly from the dashboard) or [community blueprints](https://github.com/cloudify-community/blueprint-examples)  
