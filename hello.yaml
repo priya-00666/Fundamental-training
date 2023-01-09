@@ -1,26 +1,21 @@
-tosca_definitions_version: cloudify_dsl_1_3
+tosca_definitions_version: cloudify_dsl_1_4
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
+  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
 
-inputs:
-
-  webserver_port:
-    description: The HTTP web server port.
-    default: 8000
 
 node_templates:
 
   http_web_server:
     type: cloudify.nodes.WebServer
     properties:
-      port: { get_input: webserver_port }
+      port: { get_secret: webserver_port }
     interfaces:
       cloudify.interfaces.lifecycle:
-        create: 
+        create:
           implementation: hello-resources/install.py
           executor: central_deployment_agent
-        delete: 
+        delete:
           implementation: hello-resources/uninstall.py
           executor: central_deployment_agent
 
@@ -29,4 +24,4 @@ outputs:
 
   application_endpoint:
     description: The external endpoint of the application.
-    value: { concat: [ 'http://', { get_attribute: [ http_web_server, ip ] }, ':', { get_input: webserver_port } ] }
+    value: { concat: [ 'http://', { get_attribute: [ http_web_server, ip ] }, ':', { get_secret: webserver_port } ] }

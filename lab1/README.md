@@ -16,16 +16,16 @@ In this lab you will learn how use the Cloudify CLI to:
 
 ## Uploading Blueprints
 
-The quickest way to upload blueprints to a Cloudify manager is with the command line via the `cfy blueprint upload` command. This should be executed from within the directory containing the blueprint.
+The quickest way to upload blueprints to a Cloudify manager during development is with the command line via the `cfy blueprint upload` command. This should be executed from within the directory containing the blueprint.
 
-Note, you can upload multiple copies of a blueprint file, but each copy will need to have a unique blueprint id.
+Note, you can upload multiple copies of a blueprint file, but each copy will need to have a <b>unique blueprint id</b>.
 
 For example, the following command uploads the hello.yaml blueprint to the Cloudify manager, and gives it a blueprint id of `hello`:
 
 ```
->$ pwd
-/home/centos/fundamentals-training
-[>$ cfy blueprints upload -b hello hello.yaml
+$ pwd
+/<PATH>/fundamentals-training
+$ cfy blueprints upload -b hello hello.yaml
 Uploading blueprint hello.yaml...
  hello.yaml |##########################################################| 100.0%
 Blueprint `hello` upload started.
@@ -39,29 +39,9 @@ Blueprint uploaded. The blueprint's id is hello
 
 Blueprints can also be uploaded via the UI, but they should be zipped first. For example, the following command will zip up the lab blueprints so that they can be uploaded via the UI. Notice that the `zip` is executed from **one directory above** the directory containing the blueprints.
 
+
 ```
->$ pwd
-/home/centos
->$ ls
-fundamentals-training
->$ zip -r fundamentals-training.zip fundamentals-training/ -x 'fundamentals-training/.git/*'
-  adding: fundamentals-training/ (stored 0%)
-  adding: fundamentals-training/blueprint-osp-vm-full-dp.yaml (deflated 75%)
-  adding: fundamentals-training/blueprint-osp-vm-full.yaml (deflated 75%)
-  adding: fundamentals-training/blueprint-osp-vm-solution.yaml (deflated 78%)
-  adding: fundamentals-training/blueprint-osp-vm.yaml (deflated 73%)
-  adding: fundamentals-training/openstack-example-network.yaml (deflated 80%)
-  adding: fundamentals-training/openstack-example-network.yaml~ (deflated 80%)
-  adding: fundamentals-training/openstack-vm-blueprint-ws.yaml (deflated 76%)
-  adding: fundamentals-training/resources/ (stored 0%)
-  adding: fundamentals-training/resources/index.html (deflated 39%)
-  adding: fundamentals-training/scripts/ (stored 0%)
-  adding: fundamentals-training/scripts/basic/ (stored 0%)
-...
-```
-## Listing Uploaded Blueprints
-```
-cfy blueprints list
+$ cfy blueprints list
 Listing all blueprints...
 
 Blueprints:
@@ -73,11 +53,11 @@ Blueprints:
 
 Showing 1 of 1 blueprints
 ```
-## Other Blueprints Commands
+## Other Blueprint Commands
 
 You can use the CLI help to explore commands/subcommands.
 ```
->$cfy blueprints -h
+$ cfy blueprints -h
 Usage: cfy blueprints [OPTIONS] COMMAND [ARGS]...
 
   Handle blueprints on the manager
@@ -115,7 +95,7 @@ Commands:
 Let's add a label to our `hello` blueprint. First, let's check the CLI help to see how to do that.
 
 ```
->$cfy blueprints labels -h
+$ cfy blueprints labels -h
 Usage: cfy blueprints labels [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -135,14 +115,14 @@ Commands:
 ```
 Now, you can add a label:
 ```
->$cfy blueprints labels add training:lab1 hello
+$ cfy blueprints labels add training:lab1 hello
 Adding labels to blueprint hello...
 The following label(s) were added successfully to blueprint hello: [{'training': 'lab1'}]
 ```
 ## Creating a deployment
 Use the CLI help to explore the `deployments` command on your own. And then create a deployment environment.
 ```
->$cfy deployments create hello -b hello
+$ cfy deployments create hello -b hello
 Creating new deployment from blueprint hello...
 Deployment `hello` created. The deployment's id is hello
 ```
@@ -151,7 +131,7 @@ Deployment `hello` created. The deployment's id is hello
 
 Now, you can run the install workflow.
 ```
->cfy exec start install -d hello
+$ cfy exec start install -d hello
 Executing workflow `install` on deployment `hello` [timeout=900 seconds]
 2022-04-05 01:53:43.040  CFY <hello> Starting 'install' workflow execution
 2022-04-05 01:53:43.246  CFY <hello> Subgraph started 'install_http_web_server_ohew49'
@@ -178,19 +158,28 @@ Finished executing workflow install on deployment hello
 ```
 You can check the deployments output to find the endpoint of the web application.
 ```
->cfy deployments output hello
+$ cfy deployments output hello
 Retrieving outputs for deployment hello...
  - "application_endpoint":
      Description: The external endpoint of the application.
      Value: http://<MANAGER_IP>:8000
 
 ```
-Open the link in your browser. Congrats! You've deployed your first application.
+Open the link in your browser. Congrats! You've deployed your first application. Note, port 8000 must be open on your manager to connect to the webserver. If it's not, you can go the command line of your manager VM or container and check using the curl command. For example:
+
+```
+$ curl localhost:8000 | grep Hello
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1580  100  1580    0     0   287k      0 --:--:-- --:--:-- --:--:--  308k
+        <title>Cloudify Hello World</title>
+    <div style="text-align: center; color: white; font-family: sans-serif; font-weight: bold"><h1>Hello World!</h1><br>You deployed your first Cloudify blueprint. Well done!
+```
 
 ## Updating a Deployment
 First, let's check the deployment inputs by looking at hello.yaml or with the CLI.
 ```
->cfy deployments inputs hello
+$ cfy deployments inputs hello
 Retrieving inputs for deployment hello...
  - "webserver_port":
      Value: 8000
@@ -198,7 +187,7 @@ Retrieving inputs for deployment hello...
 And now we'll update the deployment to use a different port.
 
 ```
- cfy deployments update -i 'webserver_port=8800' hello
+$ cfy deployments update -i 'webserver_port=8800' hello
 Updating deployment hello with new inputs
 2022-04-05 02:08:01.701  CFY <hello> Starting 'update' workflow execution
 2022-04-05 02:08:01.819  CFY <hello> Task started 'prepare_plan'
@@ -260,11 +249,26 @@ Updating deployment hello with new inputs
 Finished executing workflow 'update' on deployment 'hello'
 Successfully updated deployment hello. Deployment update id: hello-7baa4f08-9cb9-4228-9d2f-662e2d42a7b8. Execution id: eebf789e-3cdb-4c41-a138-cec527a06f73
 ```
-Check the browser for the updated application.
+Check the browser for the updated application. Or check it from the command line if port 8800 isn't accessible. First, we see that the website is no longer available on port 8000.
+```
+$ curl localhost:8000 | grep Hello
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (7) Failed to connect to ::1: Cannot assign requested address
+```  
+We can now see the site on port 8800.
+```
+$ curl localhost:8800 | grep Hello
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1580  100  1580    0     0   285k      0 --:--:-- --:--:-- --:--:--  308k
+        <title>Cloudify Hello World</title>
+    <div style="text-align: center; color: white; font-family: sans-serif; font-weight: bold"><h1>Hello World!</h1><br>You deployed your first Cloudify blueprint. Well done!
+```
 ## Uninstall and Delete the Deployment
 Before deleting the deployment, it must be uninstalled.
 ```
->cfy executions start uninstall -d hello
+$ cfy executions start uninstall -d hello
 Executing workflow `uninstall` on deployment `hello` [timeout=900 seconds]
 2022-04-05 02:13:23.881  CFY <hello> Starting 'uninstall' workflow execution
 2022-04-05 02:13:24.043  CFY <hello> Subgraph started 'http_web_server_ew7uzp'
@@ -286,7 +290,12 @@ Finished executing workflow uninstall on deployment hello
 ```
 Finally, let's delete the deployment.
 ```
->cfy deployments delete hello
+$ cfy deployments delete hello
 Trying to delete deployment hello...
 Deployment deleted
 ```
+## Upload a blueprint from the UI (optional).
+
+Use the [documentation](https://docs.cloudify.co/latest/trial_getting_started/examples/local/local_hello_world_example/) to upload a this [blueprint](https://github.com/cloudify-community/blueprint-examples/releases/download/latest/simple-hello-world-example.zip) using the UI. Teardown the deployment and delete the blueprint when you're finished.
+
+**Note:** you can't delete the blueprint while there are deployments.
