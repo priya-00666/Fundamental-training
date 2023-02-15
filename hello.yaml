@@ -1,15 +1,18 @@
-tosca_definitions_version: cloudify_dsl_1_4
+tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
 
+inputs:
+  webserver_port:
+    default: 8000
 
 node_templates:
 
   http_web_server:
     type: cloudify.nodes.WebServer
     properties:
-      port: { get_secret: webserver_port }
+      port: { get_input: webserver_port }
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -24,4 +27,4 @@ outputs:
 
   application_endpoint:
     description: The external endpoint of the application.
-    value: { concat: [ 'http://', { get_attribute: [ http_web_server, ip ] }, ':', { get_secret: webserver_port } ] }
+    value: { concat: [ 'http://', { get_attribute: [ http_web_server, ip ] }, ':', { get_input: webserver_port } ] }
