@@ -25,7 +25,7 @@ A Cloudify AIO (All In One) Manager installed with the minimum required resource
 4. Check that the manager is healthy from the VM command line: `$ cfy status`
 
 <b>Cloudify Manager Docker Image</b>
-1. `docker run -d cloudifyplatform/premium-cloudify-manager-aio:latest -p 80:80`
+1. `docker run -p 80:80 -d cloudifyplatform/premium-cloudify-manager-aio:latest`
 2. Check that the manager is healthy from the container command line: `$ cfy status`
 
 <b>Default admin user password</b>
