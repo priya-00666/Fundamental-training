@@ -53,7 +53,7 @@ Executing workflow `install` on deployment `hello2` [timeout=900 seconds]
 2023-03-22 21:49:39.370  CFY <hello2> [web-app_8ihddy] Starting node instance
 2023-03-22 21:49:39.453  CFY <hello2> [web-app_8ihddy.start] Sending task 'script_runner.tasks.run'
 2023-03-22 21:49:41.141  LOG <hello2> [web-app_8ihddy.start] INFO: Downloaded hello-resources/install2.py to /tmp/IYWEH/install2.py
-2023-03-22 21:49:41.272  LOG <hello2> [web-app_8ihddy.start] INFO: hello from cloudify on 35.246.63.43:8000
+2023-03-22 21:49:41.272  LOG <hello2> [web-app_8ihddy.start] INFO: hello from cloudify on X.X.X.X:8000
 2023-03-22 21:49:41.427  CFY <hello2> [web-app_8ihddy.start] Task succeeded 'script_runner.tasks.run'
 2023-03-22 21:49:41.474  CFY <hello2> [web-app_8ihddy] Poststarting node instance: nothing to do
 2023-03-22 21:49:41.521  CFY <hello2> [web-app_8ihddy] Node instance started
