@@ -44,7 +44,7 @@ node_templates:
           implementation: hello-resources/install2.py
           executor: host_agent
         delete:
-          implementation: hello-resources/uninstall.py
+          implementation: hello-resources/uninstall2.py
           executor: host_agent
     relationships:
       - target: new_http_web_server
