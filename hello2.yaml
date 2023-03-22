@@ -5,9 +5,9 @@ imports:
 
 inputs:
   webserver_port:
-    default: 8000
+    default: ''
   ip:
-    default: 35.246.63.43
+    default: ''
 
 node_types:
 
