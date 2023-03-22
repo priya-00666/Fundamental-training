@@ -11,7 +11,7 @@ In this exercise please modify hello.yaml and it's associated resources to separ
 * [Documentation - custom node types](https://docs.cloudify.co/latest/developer/blueprints/spec-node-types/)
 * [Documentation - interfaces](https://docs.cloudify.co/latest/developer/blueprints/spec-interfaces/)
 * [Documentation - agents](https://docs.cloudify.co/latest/cloudify_manager/agents/installation/)
-* [Documentation - Cloudify ctx] (https://docs.cloudify.co/latest/developer/writing_plugins/creating-your-own-plugin/#retrieving-node-properties)
+* [Documentation - Cloudify ctx](https://docs.cloudify.co/latest/developer/writing_plugins/creating-your-own-plugin/#retrieving-node-properties)
 
 ## To run the simple, low-python version of the solution
 ```
