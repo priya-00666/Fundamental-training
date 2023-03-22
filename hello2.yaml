@@ -1,0 +1,56 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.3.1/types.yaml
+
+inputs:
+  webserver_port:
+    default: 8000
+  ip:
+    default: 35.246.63.43
+
+node_types:
+
+
+  my-app:
+    derived_from: cloudify.nodes.Root
+    properties:
+      ip:
+        default: ''
+      port:
+        default: ''
+
+node_templates:
+
+  new_http_web_server:
+    type: cloudify.nodes.Compute
+    properties:
+      ip: { get_input: ip }
+      agent_config:
+        install_method: remote
+        port: 22
+        network: default
+        user: centos
+        key: { get_secret: agent-key }
+
+  web-app:
+    type: my-app
+    properties:
+      ip: { get_input: ip }
+      port: { get_input: webserver_port }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: hello-resources/install2.py
+          executor: host_agent
+        delete:
+          implementation: hello-resources/uninstall.py
+          executor: host_agent
+    relationships:
+      - target: new_http_web_server
+        type: cloudify.relationships.contained_in
+outputs:
+
+  application_endpoint:
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://', { get_attribute: [ web-app, ip ] }, ':', { get_input: webserver_port } ] }
