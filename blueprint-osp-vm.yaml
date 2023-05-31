@@ -22,6 +22,13 @@ inputs:
 
   project_domain_name:
     default: default
+    
+  inputs:
+    name: custom_text
+    type: string
+    description: Enter custom text
+    default: ""
+
 
 
 dsl_definitions:
